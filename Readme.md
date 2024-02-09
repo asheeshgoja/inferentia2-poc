@@ -3,7 +3,7 @@
 
 ### Prequisites 
 - H/W [Inf2.48xlarge ](https://aws.amazon.com/ec2/instance-types/inf2/)
-- OS - ubuntu:jammy 
+- OS - Ubuntu 20.04.6 LTS or Ubuntu 22.04.3 LTS
 
 ### Installation Steps
 - Download Mistral-7B-Instruct-v0.1 and Mistral Neuron
@@ -15,7 +15,7 @@
     ```
 - Install container runtime on the host os
     ```bash
-    ./01-host_os_install.sh
+    ./00-install-docker.sh
     ```
 - Install neuron drivers on the host os
     ```bash
@@ -47,12 +47,12 @@
 - Create the llmperf venv
     ```bash
     cd ~
-    ./00-llm_perf_venv_setup.sh
+    ./inferentia2-poc/llmperf/00-llm_perf_venv_setup.sh
     ```
 - Install the lib
     ```bash
     source ~/llmperf_venv/bin/activate
-    cd llmperf
+    cd inferentia2-poc/llmperf/
     pip install -e .
     ```
 - Run the test
@@ -136,3 +136,20 @@
     Number Of Completed Requests: 5
     Completed Requests Per Minute: 9.549433474390527
     ```
+-   You can modify the performace test params in the run_inf2.sh
+    ```bash
+    python token_benchmark_ray.py \
+    --model "inf2_mistral" \
+    --mean-input-tokens 550 \
+    --stddev-input-tokens 150 \
+    --mean-output-tokens 150 \
+    --stddev-output-tokens 10 \
+    --max-num-completed-requests 5 \
+    --timeout 600 \
+    --num-concurrent-requests 1 \
+    --results-dir "result_outputs" \
+    --llm-api inf2_mistral \
+    --additional-sampling-params '{}'
+    ```
+- Run [neuron-top](https://awsdocs-neuron.readthedocs-hosted.com/en/latest/tools/neuron-sys-tools/neuron-top-user-guide.html#overview) to see NeuronCore and vCPU utilization, memory usage, and loaded models
+![Neuron-top](neuron-top.png)

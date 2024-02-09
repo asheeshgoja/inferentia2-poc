@@ -18,19 +18,8 @@ class LocalLlmClientInf2Mistral(LLMClient):
     def llm_request(self, request_config: RequestConfig) -> Dict[str, Any]:
         prompt = request_config.prompt
         prompt, prompt_len = prompt
-
-        message = [
-            {"role": "system", "content": ""},
-            {"role": "user", "content": prompt},
-        ]
         model = request_config.model
-        body = {
-            "model": model,
-            "messages": message,
-            "stream": True,
-        }
         sampling_params = request_config.sampling_params
-        body.update(sampling_params or {})
         time_to_next_token = []
         tokens_received = 0
         ttft = 0
@@ -47,7 +36,6 @@ class LocalLlmClientInf2Mistral(LLMClient):
 
         start_time = time.monotonic()
         most_recent_received_token_time = time.monotonic()
-        # address = f"http://3.92.40.142:8000/?prompt={prompt}&temperature=0.9&max_tokens=2000&top_p=0.8&top_k=50"
         address = f"http://localhost:8000/?prompt={prompt}&temperature=0.9&max_tokens=2000&top_p=0.8&top_k=50"
 
         try:
@@ -67,22 +55,14 @@ class LocalLlmClientInf2Mistral(LLMClient):
 
                     if not chunk:
                         continue
-                    # stem = "data: "
-                    # chunk = chunk[len(stem) :]
-                    # if chunk == b"[DONE]":
-                    #     continue
                     tokens_received += 1
-                    # data = json.loads(chunk)
                     data = chunk
 
                     if "error" in data:
                         error_msg = data["error"]["message"]
                         error_response_code = data["error"]["code"]
                         raise RuntimeError(data["error"]["message"])
-                        
-                    # delta = data["choices"][0]["delta"]
-                    # delta = data["choices"][0]["delta"]
-                    # if delta.get("content", None):
+
                     if chunk:
                         if not ttft:
                             ttft = time.monotonic() - start_time
@@ -92,7 +72,6 @@ class LocalLlmClientInf2Mistral(LLMClient):
                                 time.monotonic() - most_recent_received_token_time
                             )
                         most_recent_received_token_time = time.monotonic()
-                        # generated_text += delta["content"]
                         generated_text += chunk
 
             total_request_time = time.monotonic() - start_time
@@ -104,7 +83,7 @@ class LocalLlmClientInf2Mistral(LLMClient):
             print(f"Warning Or Error: {e}")
             print(error_response_code)
 
-        metrics[common_metrics.INTER_TOKEN_LAT] = sum(time_to_next_token) #This should be same as metrics[common_metrics.E2E_LAT]. Leave it here for now
+        metrics[common_metrics.INTER_TOKEN_LAT] = sum(time_to_next_token) 
         metrics[common_metrics.TTFT] = ttft
         metrics[common_metrics.E2E_LAT] = total_request_time
         metrics[common_metrics.REQ_OUTPUT_THROUGHPUT] = output_throughput
