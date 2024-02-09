@@ -72,4 +72,4 @@ EXPOSE 8000
 EXPOSE 8265
 
 # launch ray app
-CMD ["bash", "run.sh"]/
+CMD ["bash", "run.sh"]
