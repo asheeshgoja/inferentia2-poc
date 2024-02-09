@@ -1,0 +1,1 @@
+docker build -t ray_mistral7b .

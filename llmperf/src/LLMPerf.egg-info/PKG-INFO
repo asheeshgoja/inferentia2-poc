@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: LLMPerf
+Version: 0.1.0
+Summary: A framework for load testing LLM APIs
+Author-email: Avnish Narayan <avnish@anyscale.com>
+License: Apache-2.0
+Requires-Python: <3.12,>=3.8
+Requires-Dist: pydantic<2.5
+Requires-Dist: ray
+Requires-Dist: pytest>=6.0
+Requires-Dist: seaborn>=0.11
+Requires-Dist: awscli>=1.22
+Requires-Dist: typer>=0.4
+Requires-Dist: litellm>=0.1.738
+Requires-Dist: num2words
+Requires-Dist: transformers
+Requires-Dist: tqdm
+Requires-Dist: boto3
+Requires-Dist: google-cloud-aiplatform
